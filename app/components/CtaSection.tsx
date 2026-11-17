@@ -57,7 +57,7 @@ function CtaSection() {
     <section
       ref={sectionRef}
       dir="rtl"
-      className="relative mt-10 md:mt-30 flex flex-col items-center justify-center overflow-hidden px-4 py-24 sm:px-8 lg:px-12"
+      className="relative mt-6 md:mt-24 flex flex-col items-center justify-center overflow-hidden px-4 py-12 md:py-24 sm:px-8 lg:px-12"
     >
       <div
         ref={contentRef}

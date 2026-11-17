@@ -40,10 +40,10 @@ const ProblemAndObjectives = forwardRef((_, ref) => {
   return (
     <section
       ref={ProblemAndObjectivesRef}
-      className="relative w-full overflow-hidden bg-transparent py-16 lg:h-screen lg:py-0"
+      className="relative w-full overflow-hidden bg-transparent py-10 md:py-16 lg:h-screen lg:py-0"
     >
       {/* Title header area - strictly above the cards deck */}
-      <div className="relative z-20 flex w-full items-center justify-center px-6 pt-8 pb-4 lg:pt-10 lg:px-8">
+      <div className="relative z-20 flex w-full items-center justify-center px-6 pt-4 pb-2 md:pt-8 md:pb-4 lg:pt-10 lg:px-8">
         <h2
           ref={titleRef}
           style={{ transformOrigin: "center top" }}
@@ -55,14 +55,14 @@ const ProblemAndObjectives = forwardRef((_, ref) => {
       </div>
 
       {/* Cards container - positioned comfortably below the title */}
-      <div className="relative z-10 mt-8 flex flex-col gap-5 px-4 lg:absolute lg:inset-x-0 lg:bottom-0 lg:top-[26vh] lg:mt-0 lg:block lg:px-0">
+      <div className="relative z-10 mt-6 flex flex-col gap-4 px-4 lg:absolute lg:inset-x-0 lg:bottom-0 lg:top-[26vh] lg:mt-0 lg:block lg:px-0">
         {PROBLEM_AND_OBJECTIVES_DATA.map((item, index) => (
           <div
             key={item.id}
             ref={(el) => {
               if (el) cardsRef.current[index] = el;
             }}
-            className={`relative flex min-h-[58vh] w-full flex-col items-center justify-center border-4 border-black ${item.color} ${item.textColor} px-6 py-12 shadow-[5px_5px_0_0_#111111] md:px-20 lg:absolute lg:inset-0 lg:h-full lg:border-t-4 lg:border-b-0 lg:border-x-0 lg:border-black lg:py-0 lg:shadow-none`}
+            className={`relative flex min-h-[360px] md:min-h-[440px] lg:min-h-[58vh] w-full flex-col items-center justify-center border-4 border-black ${item.color} ${item.textColor} px-6 py-8 md:py-12 shadow-[5px_5px_0_0_#111111] md:px-20 lg:absolute lg:inset-0 lg:h-full lg:border-t-4 lg:border-b-0 lg:border-x-0 lg:border-black lg:py-0 lg:shadow-none`}
             style={{ zIndex: index + 1 }}
           >
             <div className="service-content flex max-w-4xl flex-col items-center text-center">

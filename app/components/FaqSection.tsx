@@ -52,7 +52,7 @@ export const faqs: FAQItem[] = [
 ];
 export default function FaqSection() {
   return (
-    <section id="faq" className="w-full z-100  py-20 sm:px-8 lg:px-12">
+    <section id="faq" className="w-full z-100 py-10 md:py-20 sm:px-8 lg:px-12">
       <div className="mx-auto max-w-4xl z-100 p-6 sm:p-10">
         {/* Header */}
         <div className="mb-12 flex flex-col items-center gap-4 text-center">

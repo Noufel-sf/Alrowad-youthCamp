@@ -114,13 +114,13 @@ export default function AboutLayerOne({
   return (
     <section
       ref={sectionRef}
-      className={`relative min-h-[560px] w-full overflow-hidden bg-primary-950 md:h-screen ${
+      className={`relative w-full overflow-hidden bg-primary-950 py-12 md:py-0 md:h-screen ${
         className ?? ""
       }`}
     >
       <div
         ref={headlineRef}
-        className="relative z-10 flex min-h-[560px] flex-col items-center justify-center px-6 py-16 text-center md:absolute md:inset-0 md:min-h-0 md:py-0"
+        className="relative z-10 flex flex-col items-center justify-center px-6 py-4 md:py-0 text-center md:absolute md:inset-0"
       >
         {/* TITLE */}
         <h2 className="header-title -rotate-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 leading-tight tracking-tight">

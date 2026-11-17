@@ -146,44 +146,38 @@ export default function AboutLayerOne({
           const headline = headlineRef.current as HTMLElement;
 
           tl.fromTo(
-            headline.querySelectorAll(".header-title span"),
-            { y: 100, opacity: 0 },
-            { y: 0, opacity: 1, stagger: 0.15, duration: 2 },
+            logoCardRef.current,
+            { y: 50, opacity: 0, scale: 0.94 },
+            { y: 0, opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" },
             0,
           )
             .fromTo(
-              headline.querySelector(".sub-header"),
-              { y: 30, opacity: 0 },
-              { y: 0, opacity: 1, duration: 1.5 },
-              0.5,
-            )
-            .fromTo(
-              logoCardRef.current,
-              { y: 40, opacity: 0, scale: 0.94 },
-              { y: 0, opacity: 1, scale: 1, duration: 1.1, ease: "power3.out" },
-              0.9,
+              headline.querySelectorAll(".header-title span"),
+              { y: 35, opacity: 0 },
+              { y: 0, opacity: 1, stagger: 0.12, duration: 1, ease: "power2.out" },
+              0.2,
             )
             .fromTo(
               descriptionRef.current,
               { y: 25, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.9, ease: "power2.out" },
-              1.1,
+              { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" },
+              0.5,
             )
             .fromTo(
-              socialsRef.current,
-              { y: 20, opacity: 0 },
-              { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" },
-              1.25,
+              socialsRef.current?.children || [],
+              { y: 15, opacity: 0, scale: 0.9 },
+              { y: 0, opacity: 1, scale: 1, stagger: 0.08, duration: 0.6, ease: "power2.out" },
+              0.7,
             )
+            .to({}, { duration: 2 })
             .to(
               headlineRef.current,
               {
-                y: "-100vh",
+                y: -60,
                 opacity: 0,
-                duration: 3,
-                ease: "expo.in",
+                duration: 1.5,
+                ease: "power2.in",
               },
-              2,
             );
         },
       );
@@ -198,74 +192,79 @@ export default function AboutLayerOne({
   return (
     <section
       ref={sectionRef}
-      className={`relative min-h-[720px] w-full overflow-hidden bg-primary-950 md:h-screen md:min-h-0 ${
+      className={`relative w-full overflow-hidden bg-primary-950 py-10 md:py-0 md:h-screen md:min-h-0 ${
         className ?? ""
       }`}
     >
       <div
         ref={headlineRef}
-        className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center"
+        className="relative md:absolute md:inset-0 z-10 flex items-center justify-center px-6 py-4 md:py-8"
       >
-        <h2 className="header-title -rotate-2 flex flex-wrap items-center heading justify-center gap-x-4 gap-y-2 text-6xl md:text-7xl lg:text-[5rem] xl:text-[5.5rem] leading-tight tracking-tight">
-          <span className="heading text-black font-bold">صاحبة</span>
-          <span className="heading text-primary font-bold">المشروع</span>
-        </h2>
-        <div
-          ref={logoCardRef}
-          className="mx-auto mb-5 mt-6 max-w-[12rem] -rotate-2 border-4 border-black bg-white p-3 shadow-[10px_8px_0_0_#111111] sm:max-w-[24rem] md:mb-8 md:mt-10 md:p-4 lg:max-w-90"
-        >
-          <div className="">
-            <Image
-              src="/owner2.png"
-              alt="الشعار الكامل لمشروع رواد الشباب"
-              width={320}
-              height={300}
-              className="object-contain"
-              priority
-            />
-          </div>
-        </div>
-
-        <div className="mt-2 flex w-full max-w-3xl flex-col items-center gap-5 px-4 text-center sm:px-0">
-          <p
-            ref={descriptionRef}
-            className="max-w-2xl text-md leading-7 text-gray-700 sm:text-base md:text-lg"
-          >
-            شعارنا يعكس هوية المبادرة وروحها الشبابية. نحن نبني مساحة تجمع
-            الإلهام، التطوير، والعمل الجماعي لنصنع أثرًا حقيقيًا في المجتمع.
-          </p>
-
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-14 w-full max-w-4xl mx-auto">
+          {/* Photo Card */}
           <div
-            ref={socialsRef}
-            className="flex items-center justify-center gap-4"
+            ref={logoCardRef}
+            className="shrink-0 -rotate-2 hover:rotate-0 transition-transform duration-500 border-4 border-black bg-white p-3 md:p-3.5 shadow-[10px_8px_0_0_#111111] w-48 sm:w-56 md:w-60 lg:w-68 max-w-[17rem]"
           >
-            <a
-              href="https://www.instagram.com/dr.khadidja_bm?igsh=YzB6ZTFxbWQ4ajN3"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram"
-              className="inline-flex h-11 w-11 items-center justify-center border-2 border-black bg-white text-black shadow-[4px_4px_0_0_#111111] transition-transform duration-300 hover:-translate-y-1 hover:bg-primary hover:text-white"
+            <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-100">
+              <Image
+                src="/owner2.png"
+                alt="صاحبة المشروع - مخيم رواد الشباب"
+                fill
+                sizes="(max-width: 768px) 220px, 280px"
+                className="object-cover object-top"
+                priority
+              />
+            </div>
+          </div>
+
+          {/* Info Column */}
+          <div className="flex flex-col items-center lg:items-start text-center lg:text-right max-w-lg">
+            <h2 className="header-title -rotate-2 flex flex-wrap items-center heading justify-center lg:justify-start gap-x-3 gap-y-1 text-4xl sm:text-5xl md:text-5xl lg:text-[3.75rem] leading-tight tracking-tight mb-4">
+              <span className="heading text-black font-bold">صاحبة</span>
+              <span className="heading text-primary font-bold">المشروع</span>
+            </h2>
+
+            <p
+              ref={descriptionRef}
+              className="text-base sm:text-lg md:text-xl leading-relaxed text-slate-700 mb-6"
             >
-              <InstagramIcon className="h-5 w-5" />
-            </a>
-            <a
-              href="https://www.facebook.com/khadidja.bouteramansour.9?locale=fr_FR"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Facebook"
-              className="inline-flex h-11 w-11 items-center justify-center border-2 border-black bg-white text-black shadow-[4px_4px_0_0_#111111] transition-transform duration-300 hover:-translate-y-1 hover:bg-primary hover:text-white"
+              شعارنا يعكس هوية المبادرة وروحها الشبابية. نحن نبني مساحة تجمع
+              الإلهام، التطوير، والعمل الجماعي لنصنع أثرًا حقيقيًا في المجتمع.
+            </p>
+
+            <div
+              ref={socialsRef}
+              className="flex items-center justify-center lg:justify-start gap-4"
             >
-              <FacebookIcon className="h-5 w-5" />
-            </a>
-            <a
-              href="https://wa.me/+213772358023"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="WhatsApp"
-              className="inline-flex h-11 w-11 items-center justify-center border-2 border-black bg-white text-black shadow-[4px_4px_0_0_#111111] transition-transform duration-300 hover:-translate-y-1 hover:bg-primary hover:text-white"
-            >
-              <WhatsAppIcon className="h-5 w-5" />
-            </a>
+              <a
+                href="https://www.instagram.com/dr.khadidja_bm?igsh=YzB6ZTFxbWQ4ajN3"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="inline-flex h-11 w-11 items-center justify-center border-2 border-black bg-white text-black shadow-[4px_4px_0_0_#111111] transition-transform duration-300 hover:-translate-y-1 hover:bg-primary hover:text-white"
+              >
+                <InstagramIcon className="h-5 w-5" />
+              </a>
+              <a
+                href="https://www.facebook.com/khadidja.bouteramansour.9?locale=fr_FR"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="inline-flex h-11 w-11 items-center justify-center border-2 border-black bg-white text-black shadow-[4px_4px_0_0_#111111] transition-transform duration-300 hover:-translate-y-1 hover:bg-primary hover:text-white"
+              >
+                <FacebookIcon className="h-5 w-5" />
+              </a>
+              <a
+                href="https://wa.me/+213772358023"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="WhatsApp"
+                className="inline-flex h-11 w-11 items-center justify-center border-2 border-black bg-white text-black shadow-[4px_4px_0_0_#111111] transition-transform duration-300 hover:-translate-y-1 hover:bg-primary hover:text-white"
+              >
+                <WhatsAppIcon className="h-5 w-5" />
+              </a>
+            </div>
           </div>
         </div>
       </div>
