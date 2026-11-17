@@ -47,10 +47,10 @@ const ProblemAndObjectives = forwardRef((_, ref) => {
         <h2
           ref={titleRef}
           style={{ transformOrigin: "center top" }}
-          className="featured heading select-none text-center font-display text-4xl sm:text-6xl md:text-7xl lg:text-[5rem] xl:text-[5.5rem] uppercase leading-tight tracking-tight"
+          className="featured heading select-none text-center -rotate-1 text-6xl md:text-7xl lg:text-[5rem] xl:text-[5.5rem] font-bold leading-tight tracking-tight"
         >
-          الاشكالية و
-          <span className="text-primary heading"> الحلول</span>
+          الإشكالية
+          <span className="text-primary heading"> والحلول</span>
         </h2>
       </div>
 

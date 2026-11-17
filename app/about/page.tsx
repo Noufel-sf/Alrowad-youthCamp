@@ -17,6 +17,15 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function AboutPage() {
   const mainRef = useRef<HTMLDivElement | null>(null);
+  const heroRef = useRef<HTMLElement | null>(null);
+  const heroBadgeRef = useRef<HTMLDivElement | null>(null);
+  const heroTitleRef = useRef<HTMLHeadingElement | null>(null);
+  const heroLogoRef = useRef<HTMLDivElement | null>(null);
+  const heroDescRef = useRef<HTMLParagraphElement | null>(null);
+  const heroCtaRef = useRef<HTMLDivElement | null>(null);
+  const heroShape1Ref = useRef<HTMLDivElement | null>(null);
+  const heroShape2Ref = useRef<HTMLDivElement | null>(null);
+
   const problemAndObjectivesRef = useRef<{
     items?: HTMLDivElement[];
     section?: HTMLElement;
@@ -29,6 +38,47 @@ export default function AboutPage() {
 
   useGSAP(
     () => {
+      // Hero entrance animation
+      if (heroRef.current) {
+        const heroTl = gsap.timeline({ defaults: { ease: "power2.out" } });
+        heroTl
+          .fromTo(
+            heroBadgeRef.current,
+            { opacity: 0, y: -20, scale: 0.9 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.6 }
+          )
+          .fromTo(
+            heroTitleRef.current,
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.7 },
+            "-=0.3"
+          )
+          .fromTo(
+            heroLogoRef.current,
+            { opacity: 0, y: 35, scale: 0.95 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power3.out" },
+            "-=0.4"
+          )
+          .fromTo(
+            heroDescRef.current,
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.6 },
+            "-=0.3"
+          )
+          .fromTo(
+            heroCtaRef.current,
+            { opacity: 0, y: 15, scale: 0.95 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.5 },
+            "-=0.2"
+          )
+          .fromTo(
+            [heroShape1Ref.current, heroShape2Ref.current],
+            { opacity: 0, scale: 0.7, rotation: -10 },
+            { opacity: 1, scale: 1, rotation: 0, duration: 0.8, stagger: 0.15 },
+            "-=0.4"
+          );
+      }
+
       const mm = gsap.matchMedia();
 
       mm.add(
@@ -112,6 +162,40 @@ export default function AboutPage() {
                 );
             });
             servicesTl.to({}, { duration: 1 });
+          } else {
+            // Mobile on-scroll animation for ProblemAndObjectives
+            gsap.fromTo(
+              sTitle,
+              { opacity: 0, y: 30 },
+              {
+                opacity: 1,
+                y: 0,
+                duration: 0.7,
+                ease: "power2.out",
+                scrollTrigger: {
+                  trigger: sSection,
+                  start: "top 85%",
+                },
+              }
+            );
+
+            sCards.forEach((card) => {
+              gsap.fromTo(
+                card,
+                { opacity: 0, y: 35, scale: 0.95 },
+                {
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                  duration: 0.65,
+                  ease: "power2.out",
+                  scrollTrigger: {
+                    trigger: card,
+                    start: "top 85%",
+                  },
+                }
+              );
+            });
           }
           if (werbsiteBuilderRef.current) {
             const wbSection = werbsiteBuilderRef.current.section;
@@ -158,22 +242,22 @@ export default function AboutPage() {
   return (
     <main ref={mainRef} className=" py-24 z-10">
       {/* ── Hero Section ── */}
-      <section className="relative  overflow-hidden px-4 py-24 sm:px-8 lg:px-12">
+      <section ref={heroRef} className="relative overflow-hidden px-4 py-24 sm:px-8 lg:px-12">
         <div className="absolute inset-0 -z-10" />
 
         <div className="mx-auto max-w-5xl text-center">
-          <div className="mb-6 px-5 py-2.5">
+          <div ref={heroBadgeRef} className="mb-6 px-5 py-2.5">
             <span className="inline-flex items-center gap-2 border-2 border-black heading bg-secondary px-4 py-1 text-xl -rotate-3 font-bold text-black shadow-[3px_3px_0_0_#111111]">
               من نحن
             </span>
           </div>
 
-          <h1 className="heading mb-6 rotate-2 text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.5rem] font-bold leading-[1.15] tracking-tight text-slate-900">
+          <h1 ref={heroTitleRef} className="heading mb-6 rotate-2 text-4xl sm:text-6xl md:text-7xl lg:text-[5rem] xl:text-[5.75rem] font-bold leading-[1.15] tracking-tight text-slate-900">
             مخيم
             <span className="text-primary heading"> رواد الشباب</span>
           </h1>
 
-          <div className="mx-auto mb-8 w-full max-w-[18rem] -rotate-2 hover:rotate-0 transition duration-500 border-4 border-black bg-white p-4 shadow-[10px_8px_0_0_#111111] sm:max-w-[24rem] lg:max-w-120">
+          <div ref={heroLogoRef} className="mx-auto mb-8 w-full max-w-[18rem] -rotate-2 hover:rotate-0 transition duration-500 border-4 border-black bg-white p-4 shadow-[10px_8px_0_0_#111111] sm:max-w-[24rem] lg:max-w-120">
             <div className="relative aspect-16/5 w-full">
               <Image
                 src="/logo3.png"
@@ -185,14 +269,14 @@ export default function AboutPage() {
               />
             </div>
           </div>
-          <p className="text-md text-center md:text-xl mb-8 mx-auto max-w-lg text-slate-700">
+          <p ref={heroDescRef} className="text-md text-center md:text-xl mb-8 mx-auto max-w-lg text-slate-700">
             تم اختيار المشروع ضمن برنامج{" "}
             <span className="font-bold text-primary">DZ Young Leaders</span>{" "}
             التابع لوزارة الشباب وبالتنسيق مع المجلس الأعلى للشباب، مما يعكس
             أهمية دوره في دعم وتمكين الشباب الجزائري.
           </p>
 
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div ref={heroCtaRef} className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
               target="_blank"
               href="https://docs.google.com/forms/d/e/1FAIpQLSfbaB2RWp_-TUz-QmFcEI1RDSXqHGAT_W0SxGcHdRHxbjSl5g/viewform"
@@ -204,7 +288,7 @@ export default function AboutPage() {
           </div>
 
           <div
-            // ref={shape1Ref}
+            ref={heroShape1Ref}
             className="pointer-events-none absolute left-2 top-26 md:left-10 md:top-30"
           >
             <Image
@@ -219,7 +303,7 @@ export default function AboutPage() {
 
           {/* shape 2 */}
           <div
-            // ref={shape2Ref}
+            ref={heroShape2Ref}
             className="pointer-events-none absolute -right-4 top-30 md:-right-10 md:top-26"
           >
             <Image

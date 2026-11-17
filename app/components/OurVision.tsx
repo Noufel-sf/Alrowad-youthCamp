@@ -123,12 +123,12 @@ export default function AboutLayerOne({
         className="relative z-10 flex min-h-[560px] flex-col items-center justify-center px-6 py-16 text-center md:absolute md:inset-0 md:min-h-0 md:py-0"
       >
         {/* TITLE */}
-        <h2 className="header-title flex flex-col items-center justify-center gap-x-6 leading-none tracking-tighter md:flex-row">
-          <span className="mobile-fade heading -rotate-2 text-[18vw] text-black md:text-[15rem]">
+        <h2 className="header-title -rotate-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 leading-tight tracking-tight">
+          <span className="mobile-fade heading text-6xl md:text-7xl lg:text-[5rem] xl:text-[5.5rem] font-bold text-black">
             رؤيتنا
           </span>
 
-          <span className="mobile-fade heading text-[18vw] text-primary md:text-[15rem]">
+          <span className="mobile-fade heading text-6xl md:text-7xl lg:text-[5rem] xl:text-[5.5rem] font-bold text-primary">
             للشباب؟
           </span>
         </h2>

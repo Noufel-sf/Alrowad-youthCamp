@@ -63,7 +63,7 @@ function CtaSection() {
         ref={contentRef}
         className="relative mx-auto max-w-7xl text-center"
       >
-        <h2 className="heading text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5rem] font-light leading-tight tracking-tight">
+        <h2 className="heading text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[4.5rem] font-bold leading-tight tracking-tight">
           نشعل شغفك، نُطلق إبداعك، نُصقل قيادتك.
           <br />
           انضم لجيل يصنع الفارق

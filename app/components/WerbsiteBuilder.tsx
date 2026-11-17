@@ -95,6 +95,39 @@ export default function AboutLayerOne({
               ],
               { clearProps: "all" },
             );
+
+            const mobileTl = gsap.timeline({
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 80%",
+              },
+            });
+
+            mobileTl
+              .fromTo(
+                headlineRef.current?.querySelectorAll(".header-title span") || [],
+                { y: 30, opacity: 0 },
+                { y: 0, opacity: 1, stagger: 0.12, duration: 0.7, ease: "power2.out" }
+              )
+              .fromTo(
+                logoCardRef.current,
+                { y: 35, opacity: 0, scale: 0.94 },
+                { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: "power3.out" },
+                "-=0.3"
+              )
+              .fromTo(
+                descriptionRef.current,
+                { y: 20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
+                "-=0.2"
+              )
+              .fromTo(
+                socialsRef.current?.children || [],
+                { y: 15, opacity: 0, scale: 0.9 },
+                { y: 0, opacity: 1, scale: 1, stagger: 0.08, duration: 0.5, ease: "power2.out" },
+                "-=0.2"
+              );
+
             return;
           }
 
@@ -173,13 +206,13 @@ export default function AboutLayerOne({
         ref={headlineRef}
         className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center"
       >
-        <h2 className="header-title -rotate-2 flex flex-col items-center heading justify-center gap-x-6 font-display text-[12vw] uppercase leading-none tracking-tighter  md:flex-row md:text-[8rem]">
-          <span className=" heading "> صاحبة</span>
-          <span className=" heading text-primary"> المشروع</span>
+        <h2 className="header-title -rotate-2 flex flex-wrap items-center heading justify-center gap-x-4 gap-y-2 text-6xl md:text-7xl lg:text-[5rem] xl:text-[5.5rem] leading-tight tracking-tight">
+          <span className="heading text-black font-bold">صاحبة</span>
+          <span className="heading text-primary font-bold">المشروع</span>
         </h2>
         <div
           ref={logoCardRef}
-          className="mx-auto mb-5 mt-10 max-w-[12rem] -rotate-2 border-4 border-black bg-white p-3 shadow-[10px_8px_0_0_#111111] sm:max-w-[24rem] md:mb-8 md:mt-20 md:p-4 lg:max-w-90"
+          className="mx-auto mb-5 mt-6 max-w-[12rem] -rotate-2 border-4 border-black bg-white p-3 shadow-[10px_8px_0_0_#111111] sm:max-w-[24rem] md:mb-8 md:mt-10 md:p-4 lg:max-w-90"
         >
           <div className="">
             <Image
@@ -196,7 +229,7 @@ export default function AboutLayerOne({
         <div className="mt-2 flex w-full max-w-3xl flex-col items-center gap-5 px-4 text-center sm:px-0">
           <p
             ref={descriptionRef}
-            className="max-w-2xl text-sm leading-7 text-gray-700 sm:text-base md:text-lg"
+            className="max-w-2xl text-md leading-7 text-gray-700 sm:text-base md:text-lg"
           >
             شعارنا يعكس هوية المبادرة وروحها الشبابية. نحن نبني مساحة تجمع
             الإلهام، التطوير، والعمل الجماعي لنصنع أثرًا حقيقيًا في المجتمع.
