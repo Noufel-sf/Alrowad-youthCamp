@@ -54,21 +54,29 @@ const PROGRAM_PILLARS = [
 
 export default function ReelVideo() {
   const sectionRef = useRef<HTMLElement>(null);
+  const phoneRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const isMutedRef = useRef(false);
+  const isMutedRef = useRef(true);
 
   useEffect(() => {
     isMutedRef.current = isMuted;
   }, [isMuted]);
 
-  // Track when the video section enters and leaves the viewport
+  // Ensure defaultMuted is set on DOM element for iOS Safari autoplay compliance
   useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
+    if (videoRef.current) {
+      videoRef.current.defaultMuted = true;
+      videoRef.current.muted = true;
+    }
+  }, []);
+
+  // Track when the phone mockup enters and leaves the viewport
+  useEffect(() => {
+    const target = phoneRef.current || sectionRef.current;
+    if (!target) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -76,70 +84,57 @@ export default function ReelVideo() {
         if (!entry) return;
 
         if (entry.isIntersecting) {
-          setShouldLoadVideo(true);
           setIsInView(true);
         } else {
           setIsInView(false);
         }
       },
       {
-        threshold: 0.2, // Triggers when at least 20% of section is visible
+        threshold: 0.15, // Triggers as soon as the phone frame enters the screen
       }
     );
 
-    observer.observe(section);
+    observer.observe(target);
     return () => observer.disconnect();
   }, []);
 
-  // Play video with sound when in section; STOP and pause when scrolling away
+  // Play video automatically on mobile and desktop when in section; STOP and pause when scrolling away
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !shouldLoadVideo) return;
+    if (!video) return;
 
     if (isInView) {
+      video.defaultMuted = isMutedRef.current;
       video.muted = isMutedRef.current;
       video.volume = 1.0;
 
       const playPromise = video.play();
       if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsMuted(video.muted);
-          })
-          .catch(() => {
-            // If browser blocks unmuted playback before user interaction, play muted then unmute
-            video.muted = true;
-            video.play().catch(() => {});
-            setIsMuted(true);
-            isMutedRef.current = true;
-
-            const unmuteOnGesture = () => {
-              if (videoRef.current && isInView) {
-                videoRef.current.muted = false;
-                videoRef.current.volume = 1.0;
-                videoRef.current.play().catch(() => {});
-                setIsMuted(false);
-                isMutedRef.current = false;
-              }
-              window.removeEventListener("click", unmuteOnGesture);
-              window.removeEventListener("touchstart", unmuteOnGesture);
-            };
-
-            window.addEventListener("click", unmuteOnGesture, { once: true });
-            window.addEventListener("touchstart", unmuteOnGesture, { once: true });
-          });
+        playPromise.catch(() => {
+          // If browser policy blocks unmuted playback, force muted playback (guaranteed on all mobile devices)
+          video.defaultMuted = true;
+          video.muted = true;
+          setIsMuted(true);
+          isMutedRef.current = true;
+          video.play().catch(() => {});
+        });
       }
     } else {
-      // User scrolled out of the section -> pause video and stop audio immediately
+      // User scrolled out of the section -> pause video immediately
       video.pause();
     }
-  }, [isInView, shouldLoadVideo]);
+  }, [isInView]);
 
   const toggleSound = () => {
     if (videoRef.current) {
       const nextMuted = !videoRef.current.muted;
       videoRef.current.muted = nextMuted;
+      videoRef.current.volume = 1.0;
       setIsMuted(nextMuted);
+      isMutedRef.current = nextMuted;
+      if (videoRef.current.paused) {
+        videoRef.current.play().catch(() => {});
+      }
     }
   };
 
@@ -195,7 +190,7 @@ export default function ReelVideo() {
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2 border border-secondary/30 sm:h-[450px] sm:w-[450px]" />
 
         {/* Center Smartphone Mockup Frame */}
-        <div className="relative mx-auto w-[280px] sm:w-[320px] md:w-[340px]">
+        <div ref={phoneRef} className="relative mx-auto w-[280px] sm:w-[320px] md:w-[340px]">
           <div className="relative  border-4 border-black rounded-md bg-black p-2 shadow-[10px_10px_0_0_#111111] transition-transform hover:scale-[1.01]">
             {/* Phone Notch/Speaker */}
             <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 h-4 w-24  bg-black/80 flex items-center justify-center">
@@ -204,50 +199,39 @@ export default function ReelVideo() {
 
             {/* Video Container */}
             <div className="relative aspect-[9/16] w-full overflow-hidden  bg-slate-950">
-              {shouldLoadVideo ? (
-                <video
-                  ref={videoRef}
-                  className="h-full w-full object-cover"
-                  controls
-                  loop
-                  muted={isMuted}
-                  autoPlay
-                  playsInline
-                  preload="metadata"
-                >
-                  <source src="/videodef.mp4" type="video/mp4" />
-                  متصفحك لا يدعم تشغيل هذا الفيديو.
-                </video>
-              ) : (
-                <div className="flex h-full w-full flex-col items-center justify-center gap-3 p-4 text-center text-white/60">
-                  <div className="h-10 w-10 animate-spin  border-2 border-secondary border-t-transparent" />
-                  <span className="text-sm font-medium">جاري تجهيز الفيديو الرسمي...</span>
-                </div>
-              )}
+              <video
+                ref={videoRef}
+                className="h-full w-full object-cover cursor-pointer"
+                loop
+                muted={isMuted}
+                autoPlay
+                playsInline
+                preload="auto"
+                onClick={toggleSound}
+              >
+                <source src="/videodef.mp4" type="video/mp4" />
+                متصفحك لا يدعم تشغيل هذا الفيديو.
+              </video>
 
               {/* Sound Toggle Button Overlay */}
-              {shouldLoadVideo && (
-                <button
-                  type="button"
-                  onClick={toggleSound}
-                  aria-label={isMuted ? "تشغيل الصوت" : "كتم الصوت"}
-                  className="absolute bottom-4 left-4 z-20 flex items-center gap-2 border-2 border-black bg-white/95 px-3 py-1.5 text-xs font-bold text-black shadow-[2px_2px_0_0_#111111] transition-transform hover:scale-105 active:scale-95 cursor-pointer"
-                >
-                  {isMuted ? (
-                    <>
-                      <VolumeX size={15} className="text-rose-600" />
-                      <span>الصوت مكتوم (انقر للتشغيل)</span>
-                    </>
-                  ) : (
-                    <>
-                      <Volume2 size={15} className="text-primary animate-pulse" />
-                      <span>الصوت يعمل 🔊</span>
-                    </>
-                  )}
-                </button>
-              )}
-
-  
+              <button
+                type="button"
+                onClick={toggleSound}
+                aria-label={isMuted ? "تشغيل الصوت" : "كتم الصوت"}
+                className="absolute bottom-4 left-4 z-20 flex items-center gap-2 border-2 border-black bg-white/95 px-3 py-1.5 text-xs font-bold text-black shadow-[2px_2px_0_0_#111111] transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                {isMuted ? (
+                  <>
+                    <VolumeX size={15} className="text-rose-600" />
+                    <span>الصوت مكتوم (انقر للتشغيل 🔊)</span>
+                  </>
+                ) : (
+                  <>
+                    <Volume2 size={15} className="text-primary animate-pulse" />
+                    <span>الصوت يعمل 🔊</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
