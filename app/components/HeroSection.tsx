@@ -83,13 +83,15 @@ export default function HeroSection() {
 
         {/* buttons */}
         <div className="mt-12 flex items-center justify-center gap-5">
-          <Link
-            href="/register"
+          <a
+            href="https://docs.google.com/forms/d/e/1FAIpQLSe2yxS1bXCMptKtvIf85WYZGMMnWuELOPF0MH3Z4WDhHFrNfg/viewform"
+            target="_blank"
+            rel="noopener noreferrer"
             className="heading inline-flex h-14 items-center gap-3 border-2 border-black bg-primary px-8 text-md md:text-lg font-black text-white shadow-[5px_5px_0_0_#111111] transition-transform hover:-translate-y-1 hover:shadow-[8px_8px_0_0_#111111]"
           >
             سجل الآن
             <ArrowLeft className="h-5 w-5" />
-          </Link>
+          </a>
 
           <Link
             href="/about"

@@ -85,7 +85,8 @@ function CtaSection() {
 
           <a
             target="_blank"
-            href=""
+            rel="noopener noreferrer"
+            href="https://docs.google.com/forms/d/e/1FAIpQLSe2yxS1bXCMptKtvIf85WYZGMMnWuELOPF0MH3Z4WDhHFrNfg/viewform"
             className="inline-flex heading items-center gap-2 border-2 border-black bg-secondary px-8 py-3 md:text-lg font-bold shadow-[4px_4px_0_0_#111111] hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none"
           >
             انضم الآن

@@ -280,7 +280,8 @@ export default function AboutPage() {
           <div ref={heroCtaRef} className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
               target="_blank"
-              href="https://docs.google.com/forms/d/e/1FAIpQLSfbaB2RWp_-TUz-QmFcEI1RDSXqHGAT_W0SxGcHdRHxbjSl5g/viewform"
+              rel="noopener noreferrer"
+              href="https://docs.google.com/forms/d/e/1FAIpQLSe2yxS1bXCMptKtvIf85WYZGMMnWuELOPF0MH3Z4WDhHFrNfg/viewform"
               className="heading flex items-center flex-row-reverse h-12 text-white border-2 border-black px-8 bg-primary  shadow-[4px_4px_0_0_#111111] hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none "
             >
               سجل الآن

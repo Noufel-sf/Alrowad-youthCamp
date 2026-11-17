@@ -47,7 +47,7 @@ export default function ContactPage() {
         </p>
         <div className="px-6 pb-8 max-w-sm mt-5 mx-auto">
           <a
-            href="https://docs.google.com/forms/d/e/1FAIpQLSdHvr5R3_eS0nwktsFXqSuOYsEY9dgGL9o81FpBuD_gdY6BSQ/viewform?usp=dialog"
+            href="https://docs.google.com/forms/d/e/1FAIpQLSe2yxS1bXCMptKtvIf85WYZGMMnWuELOPF0MH3Z4WDhHFrNfg/viewform"
             target="_blank"
             rel="noopener noreferrer"
             className="heading flex items-center flex-row-reverse h-12 border-2 border-black px-4 justify-center bg-primary text-white  shadow-[4px_4px_0_0_#111111] hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none "
