@@ -54,18 +54,29 @@ const PROGRAM_PILLARS = [
 
 export default function ReelVideo() {
   const sectionRef = useRef<HTMLElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const phoneRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isInView, setIsInView] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const isMutedRef = useRef(true);
 
-  // Play video automatically on scroll into view, pause on scroll out
   useEffect(() => {
-    const section = sectionRef.current;
-    const video = videoRef.current;
-    if (!section || !video) return;
+    isMutedRef.current = isMuted;
+  }, [isMuted]);
 
-    // Browser standard: muted is required for guaranteed autoplay on both desktop and mobile
-    video.muted = false;
+  // Ensure defaultMuted is set on DOM element for iOS Safari autoplay compliance
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.defaultMuted = true;
+      videoRef.current.muted = true;
+    }
+  }, []);
+
+  // Track when the phone mockup enters and leaves the viewport
+  useEffect(() => {
+    const target = phoneRef.current || sectionRef.current;
+    if (!target) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -73,31 +84,57 @@ export default function ReelVideo() {
         if (!entry) return;
 
         if (entry.isIntersecting) {
-          video.play().catch(() => {});
+          setIsInView(true);
         } else {
-          video.pause();
+          setIsInView(false);
         }
       },
       {
-        threshold: 0.2, // Triggers when at least 20% is in viewport
+        threshold: 0.15, // Triggers as soon as the phone frame enters the screen
       }
     );
 
-    observer.observe(section);
+    observer.observe(target);
     return () => observer.disconnect();
   }, []);
 
-  const toggleSound = (e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
+  // Play video automatically on mobile and desktop when in section; STOP and pause when scrolling away
+  useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const nextMuted = !video.muted;
-    video.muted = nextMuted;
-    video.volume = 1.0;
-    setIsMuted(nextMuted);
-    if (video.paused) {
-      video.play().catch(() => {});
+    if (isInView) {
+      video.defaultMuted = isMutedRef.current;
+      video.muted = isMutedRef.current;
+      video.volume = 1.0;
+
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // If browser policy blocks unmuted playback, force muted playback (guaranteed on all mobile devices)
+          video.defaultMuted = true;
+          video.muted = true;
+          setIsMuted(true);
+          isMutedRef.current = true;
+          video.play().catch(() => {});
+        });
+      }
+    } else {
+      // User scrolled out of the section -> pause video immediately
+      video.pause();
+    }
+  }, [isInView]);
+
+  const toggleSound = () => {
+    if (videoRef.current) {
+      const nextMuted = !videoRef.current.muted;
+      videoRef.current.muted = nextMuted;
+      videoRef.current.volume = 1.0;
+      setIsMuted(nextMuted);
+      isMutedRef.current = nextMuted;
+      if (videoRef.current.paused) {
+        videoRef.current.play().catch(() => {});
+      }
     }
   };
 
@@ -153,7 +190,7 @@ export default function ReelVideo() {
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2 border border-secondary/30 sm:h-[450px] sm:w-[450px]" />
 
         {/* Center Smartphone Mockup Frame */}
-        <div className="relative mx-auto w-[280px] sm:w-[320px] md:w-[340px]">
+        <div ref={phoneRef} className="relative mx-auto w-[280px] sm:w-[320px] md:w-[340px]">
           <div className="relative  border-4 border-black rounded-md bg-black p-2 shadow-[10px_10px_0_0_#111111] transition-transform hover:scale-[1.01]">
             {/* Phone Notch/Speaker */}
             <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 h-4 w-24  bg-black/80 flex items-center justify-center">
