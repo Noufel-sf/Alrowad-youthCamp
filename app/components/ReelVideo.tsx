@@ -54,17 +54,18 @@ const PROGRAM_PILLARS = [
 
 export default function ReelVideo() {
   const sectionRef = useRef<HTMLElement>(null);
-  const phoneRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isInView, setIsInView] = useState(false);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const [isMuted, setIsMuted] = useState(false);
-  const userExplicitlyMuted = useRef(false);
 
-  // Track when the phone mockup enters and leaves the viewport
+  // Play video automatically on scroll into view, pause on scroll out
   useEffect(() => {
-    const target = phoneRef.current || sectionRef.current;
-    if (!target) return;
+    const section = sectionRef.current;
+    const video = videoRef.current;
+    if (!section || !video) return;
+
+    // Browser standard: muted is required for guaranteed autoplay on both desktop and mobile
+    video.muted = false;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -72,101 +73,31 @@ export default function ReelVideo() {
         if (!entry) return;
 
         if (entry.isIntersecting) {
-          setIsInView(true);
+          video.play().catch(() => {});
         } else {
-          setIsInView(false);
+          video.pause();
         }
       },
       {
-        threshold: 0.15, // Triggers as soon as the phone frame enters the screen
+        threshold: 0.2, // Triggers when at least 20% is in viewport
       }
     );
 
-    observer.observe(target);
+    observer.observe(section);
     return () => observer.disconnect();
   }, []);
 
-  // Listen to any touch/click to unlock audio on mobile and keep sound active unless user explicitly muted
-  useEffect(() => {
-    const unlockAudio = () => {
-      if (videoRef.current && !userExplicitlyMuted.current) {
-        videoRef.current.muted = false;
-        videoRef.current.volume = 1.0;
-        setIsMuted(false);
-        if (!videoRef.current.paused) {
-          videoRef.current.play().catch(() => {});
-        }
-      }
-    };
-
-    window.addEventListener("touchstart", unlockAudio, { passive: true });
-    window.addEventListener("touchend", unlockAudio, { passive: true });
-    window.addEventListener("click", unlockAudio, { passive: true });
-
-    return () => {
-      window.removeEventListener("touchstart", unlockAudio);
-      window.removeEventListener("touchend", unlockAudio);
-      window.removeEventListener("click", unlockAudio);
-    };
-  }, []);
-
-  // Play video with sound automatically when in section; STOP and pause when scrolling away
-  useEffect(() => {
+  const toggleSound = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     const video = videoRef.current;
     if (!video) return;
 
-    if (isInView) {
-      // By default the video is NOT muted, unless the user explicitly muted it
-      video.muted = userExplicitlyMuted.current;
-      video.volume = 1.0;
-
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsMuted(video.muted);
-          })
-          .catch(() => {
-            // If browser blocks unmuted playback before user interaction, play muted then unmute immediately on touch/scroll
-            video.muted = true;
-            setIsMuted(true);
-            video.play().catch(() => {});
-
-            const unmuteOnGesture = () => {
-              if (videoRef.current && !userExplicitlyMuted.current) {
-                videoRef.current.muted = false;
-                videoRef.current.volume = 1.0;
-                videoRef.current.play().catch(() => {});
-                setIsMuted(false);
-              }
-              window.removeEventListener("touchstart", unmuteOnGesture);
-              window.removeEventListener("touchend", unmuteOnGesture);
-              window.removeEventListener("click", unmuteOnGesture);
-              window.removeEventListener("scroll", unmuteOnGesture);
-            };
-
-            window.addEventListener("touchstart", unmuteOnGesture, { once: true, passive: true });
-            window.addEventListener("touchend", unmuteOnGesture, { once: true, passive: true });
-            window.addEventListener("click", unmuteOnGesture, { once: true, passive: true });
-            window.addEventListener("scroll", unmuteOnGesture, { once: true, passive: true });
-          });
-      }
-    } else {
-      // User scrolled out of the section -> pause video immediately
-      video.pause();
-    }
-  }, [isInView]);
-
-  const toggleSound = () => {
-    if (videoRef.current) {
-      const nextMuted = !videoRef.current.muted;
-      videoRef.current.muted = nextMuted;
-      videoRef.current.volume = 1.0;
-      userExplicitlyMuted.current = nextMuted;
-      setIsMuted(nextMuted);
-      if (videoRef.current.paused) {
-        videoRef.current.play().catch(() => {});
-      }
+    const nextMuted = !video.muted;
+    video.muted = nextMuted;
+    video.volume = 1.0;
+    setIsMuted(nextMuted);
+    if (video.paused) {
+      video.play().catch(() => {});
     }
   };
 
@@ -222,7 +153,7 @@ export default function ReelVideo() {
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-[360px] w-[360px] -translate-x-1/2 -translate-y-1/2 border border-secondary/30 sm:h-[450px] sm:w-[450px]" />
 
         {/* Center Smartphone Mockup Frame */}
-        <div ref={phoneRef} className="relative mx-auto w-[280px] sm:w-[320px] md:w-[340px]">
+        <div className="relative mx-auto w-[280px] sm:w-[320px] md:w-[340px]">
           <div className="relative  border-4 border-black rounded-md bg-black p-2 shadow-[10px_10px_0_0_#111111] transition-transform hover:scale-[1.01]">
             {/* Phone Notch/Speaker */}
             <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 h-4 w-24  bg-black/80 flex items-center justify-center">
