@@ -59,19 +59,7 @@ export default function ReelVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isInView, setIsInView] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const isMutedRef = useRef(true);
-
-  useEffect(() => {
-    isMutedRef.current = isMuted;
-  }, [isMuted]);
-
-  // Ensure defaultMuted is set on DOM element for iOS Safari autoplay compliance
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.defaultMuted = true;
-      videoRef.current.muted = true;
-    }
-  }, []);
+  const userExplicitlyMuted = useRef(false);
 
   // Track when the phone mockup enters and leaves the viewport
   useEffect(() => {
@@ -98,26 +86,70 @@ export default function ReelVideo() {
     return () => observer.disconnect();
   }, []);
 
-  // Play video automatically on mobile and desktop when in section; STOP and pause when scrolling away
+  // Listen to any touch/click to unlock audio on mobile and keep sound active unless user explicitly muted
+  useEffect(() => {
+    const unlockAudio = () => {
+      if (videoRef.current && !userExplicitlyMuted.current) {
+        videoRef.current.muted = false;
+        videoRef.current.volume = 1.0;
+        setIsMuted(false);
+        if (!videoRef.current.paused) {
+          videoRef.current.play().catch(() => {});
+        }
+      }
+    };
+
+    window.addEventListener("touchstart", unlockAudio, { passive: true });
+    window.addEventListener("touchend", unlockAudio, { passive: true });
+    window.addEventListener("click", unlockAudio, { passive: true });
+
+    return () => {
+      window.removeEventListener("touchstart", unlockAudio);
+      window.removeEventListener("touchend", unlockAudio);
+      window.removeEventListener("click", unlockAudio);
+    };
+  }, []);
+
+  // Play video with sound automatically when in section; STOP and pause when scrolling away
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     if (isInView) {
-      video.defaultMuted = isMutedRef.current;
-      video.muted = isMutedRef.current;
+      // By default the video is NOT muted, unless the user explicitly muted it
+      video.muted = userExplicitlyMuted.current;
       video.volume = 1.0;
 
       const playPromise = video.play();
       if (playPromise !== undefined) {
-        playPromise.catch(() => {
-          // If browser policy blocks unmuted playback, force muted playback (guaranteed on all mobile devices)
-          video.defaultMuted = true;
-          video.muted = true;
-          setIsMuted(true);
-          isMutedRef.current = true;
-          video.play().catch(() => {});
-        });
+        playPromise
+          .then(() => {
+            setIsMuted(video.muted);
+          })
+          .catch(() => {
+            // If browser blocks unmuted playback before user interaction, play muted then unmute immediately on touch/scroll
+            video.muted = true;
+            setIsMuted(true);
+            video.play().catch(() => {});
+
+            const unmuteOnGesture = () => {
+              if (videoRef.current && !userExplicitlyMuted.current) {
+                videoRef.current.muted = false;
+                videoRef.current.volume = 1.0;
+                videoRef.current.play().catch(() => {});
+                setIsMuted(false);
+              }
+              window.removeEventListener("touchstart", unmuteOnGesture);
+              window.removeEventListener("touchend", unmuteOnGesture);
+              window.removeEventListener("click", unmuteOnGesture);
+              window.removeEventListener("scroll", unmuteOnGesture);
+            };
+
+            window.addEventListener("touchstart", unmuteOnGesture, { once: true, passive: true });
+            window.addEventListener("touchend", unmuteOnGesture, { once: true, passive: true });
+            window.addEventListener("click", unmuteOnGesture, { once: true, passive: true });
+            window.addEventListener("scroll", unmuteOnGesture, { once: true, passive: true });
+          });
       }
     } else {
       // User scrolled out of the section -> pause video immediately
@@ -130,8 +162,8 @@ export default function ReelVideo() {
       const nextMuted = !videoRef.current.muted;
       videoRef.current.muted = nextMuted;
       videoRef.current.volume = 1.0;
+      userExplicitlyMuted.current = nextMuted;
       setIsMuted(nextMuted);
-      isMutedRef.current = nextMuted;
       if (videoRef.current.paused) {
         videoRef.current.play().catch(() => {});
       }
